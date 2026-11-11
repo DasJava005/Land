@@ -32,13 +32,10 @@ public class LandService {
     }
 
     public CompletableFuture<Void> update(LandID id, UnaryOperator<Land> update) {
-        return this.getLand(id)
-                .thenApply(land -> { // remove old data from cache
-                    landCache.remove(land.id(), land.owner());
-                    return land;
-                })
-                .thenApply(update) // apply update
-                .thenCompose(landRepository::save);
+        return getLand(id)
+                .thenApply(update)
+                .thenCompose(land -> landRepository.save(land).thenApply(result -> land))
+                .thenAccept(land -> landCache.remove(land.id(), land.owner()));
     }
 
     public CompletableFuture<Void> delete(LandID id, @Nullable UUID owner) {

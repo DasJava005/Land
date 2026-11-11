@@ -4,9 +4,12 @@ import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
 import com.github.DasJava005.cmdApi.reflection.annotations.Cmd;
 import com.github.DasJava005.cmdApi.reflection.annotations.CommandGroup;
 import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.conversations.PluginNameConversationPrefix;
 import org.bukkit.entity.Player;
 import org.github.DasJava.land.Land;
 import org.github.DasJava.land.LandID;
@@ -16,7 +19,6 @@ import org.github.DasJava.land.service.LandTeleportService;
 import org.github.DasJava.land.utils.MessageProvider;
 import org.github.DasJava.land.utils.Position3D;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -69,13 +71,16 @@ public class LandCommand {
 
     @Cmd("list")
     public void list(@Sender Player player) {
-        UUID uuid = player.getUniqueId();
         CompletableFuture<List<Land>> future = landService.getLands(player.getUniqueId());
         future.thenAcceptAsync(list -> {
             list.forEach(land -> {
-                Player p  = Bukkit.getPlayer(uuid);
-                if(p == null) return;
-                p.sendMessage(ChatColor.GREEN + land.name() + ChatColor.YELLOW + " (" + land.id().toString() + ")");
+                if(!player.isOnline()) return;
+
+                TextComponent text = new TextComponent(messageProvider.prefix + ChatColor.GRAY + " - " + ChatColor.GOLD + land.name() + ChatColor.YELLOW + ChatColor.ITALIC + " <tp>");
+                text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/land go " + land.id().worldName() + " " +  land.id().x() + " " + land.id().z()));
+                text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + "Click to teleport!").create()));
+
+                player.spigot().sendMessage(text);
             });
         }, mainThreadExecutor);
     }

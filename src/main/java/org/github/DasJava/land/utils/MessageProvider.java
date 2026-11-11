@@ -10,7 +10,7 @@ import java.util.Objects;
 public class MessageProvider {
 
     public final String prefix;
-    public final DateTimeFormatter dateTimeFormatter;
+    private final DateTimeFormatter dateTimeFormatter;
 
     public MessageProvider(String prefix, DateTimeFormatter dateTimeFormatter) {
         this.prefix = Objects.requireNonNull(prefix);

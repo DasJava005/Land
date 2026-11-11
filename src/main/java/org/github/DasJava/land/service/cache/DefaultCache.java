@@ -64,6 +64,8 @@ public class DefaultCache implements LandCache {
         if (owner != null) {
             players.synchronous().invalidate(owner);
         }
+
+        //TODO: also invalidate old owner
     }
 
     @Override

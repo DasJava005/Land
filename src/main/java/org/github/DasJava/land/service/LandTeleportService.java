@@ -45,7 +45,7 @@ public class LandTeleportService {
     private Location calculateDefaultSpawnPoint(LandID id, World world) {
         int x =  id.x() * LandID.LAND_SIZE;
         int z = id.z() * LandID.LAND_SIZE;
-        return new Location(world, x, world.getHighestBlockYAt(x, z), z);
+        return new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
     }
 
 }
