@@ -1,0 +1,8 @@
+name: Land
+version: '${version}'
+
+main: org.github.DasJava.land.Main
+api-version: '26.1'
+
+commands:
+   test:
