@@ -18,19 +18,23 @@ public class LandClaimService {
     }
 
     public CompletableFuture<ClaimResult> claim(final LandID landID, UUID owner, Position3D home, String name) {
-        //TODO: call LandPreClaimEvent
-
-        CompletableFuture<Land> futureLand = landService.getLand(landID);
-        return futureLand.thenCompose(land -> {
-            if(land.isClaimed()) {
+        // TODO: call LandPreClaimEvent but sync with main thread
+        return landService.getLand(landID).thenCompose(land -> {
+            if (land.isClaimed()) {
                 return CompletableFuture.completedFuture(ClaimResult.ALREADY_CLAIMED);
             }
 
-            return landService.update(landID, landOperator ->
-                    new Land(landID, Instant.now(), home, name, owner, List.of(), "")
-            ).thenApply(result -> {
-                // TODO: call LandClaimEvent
-                return ClaimResult.SUCCESS;
+            return landService.getLands(owner).thenCompose(claimedLands -> {
+                boolean nameExists = claimedLands.stream().anyMatch(l -> l.name().equalsIgnoreCase(name));
+                if (nameExists) {
+                    return CompletableFuture.completedFuture(ClaimResult.NAME_ALREADY_IN_USE);
+                }
+
+                return landService.update(landID, landOperator -> new Land(landID, Instant.now(), home, name, owner, List.of(), ""))
+                        .thenApply(result -> {
+                            // TODO: call LandClaimEvent but sync with main thread
+                            return ClaimResult.SUCCESS;
+                        });
             });
         });
     }
@@ -38,6 +42,7 @@ public class LandClaimService {
     public static enum ClaimResult {
         SUCCESS,
         ALREADY_CLAIMED,
+        NAME_ALREADY_IN_USE
     }
 
 }

@@ -109,6 +109,7 @@ public class LandCommand {
             switch (result) {
                 case SUCCESS -> player.sendMessage(ChatColor.GREEN + "You have claimed a new Land.");
                 case ALREADY_CLAIMED -> player.sendMessage("Land is already claimed.!");
+                case NAME_ALREADY_IN_USE -> messageProvider.send(player, ChatColor.YELLOW + "'"+ name +"'"+ ChatColor.RED +" is already taken!");
             }
         },  mainThreadExecutor);
 
