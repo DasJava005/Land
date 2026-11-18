@@ -8,7 +8,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,6 +23,7 @@ import org.github.DasJava.land.utils.MessageProvider;
 import org.github.DasJava.land.utils.Position3D;
 import org.jspecify.annotations.NonNull;
 
+import javax.inject.Named;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -61,15 +61,24 @@ public class LandCommand {
         CompletableFuture<Land> futureLand = landService.getLand(LandID.fromLocation(player.getLocation()));
         futureLand.thenAcceptAsync(land -> {
             if(!land.isClaimed()){
-                messageProvider.send(player, "This Land is unclaimed!");
+                messageProvider.send(player, Component.text("Land is not claimed!", NamedTextColor.RED));
                 return;
             }
 
             messageProvider.send(player,  Component.text("--------------").color(NamedTextColor.GRAY).decorate(TextDecoration.STRIKETHROUGH));
-            messageProvider.send(player,  Component.text("ID: ", NamedTextColor.GREEN).append(Component.text(land.id().toString(), NamedTextColor.YELLOW)));
-            messageProvider.send(player, ChatColor.GREEN + "Name: " + land.name());
-            messageProvider.send(player, ChatColor.GREEN + "Owner: " + ChatColor.GOLD + Bukkit.getOfflinePlayer(land.owner()).getName());
-            messageProvider.send(player, ChatColor.GREEN + "Claimed at: " + messageProvider.formatInstant(land.createdAt()));
+
+            messageProvider.send(player,  Component.text("ID: ", NamedTextColor.WHITE)
+                    .append(Component.text(land.id().toString(), NamedTextColor.YELLOW)));
+
+            messageProvider.send(player, Component.text("Name: ", NamedTextColor.WHITE)
+                    .append(Component.text(land.name(), NamedTextColor.GREEN)));
+
+            messageProvider.send(player, Component.text("Owner: ", NamedTextColor.WHITE)
+                    .append(Component.text(Objects.requireNonNull(Bukkit.getOfflinePlayer(land.owner()).getName()), NamedTextColor.YELLOW)));
+
+            messageProvider.send(player, Component.text("Claimed at", NamedTextColor.WHITE)
+                    .append(Component.text(messageProvider.formatInstant(land.createdAt()), NamedTextColor.WHITE)));
+
             messageProvider.send(player,  Component.text("--------------").color(NamedTextColor.GRAY).decorate(TextDecoration.STRIKETHROUGH));
 
         }, mainThreadExecutor);
@@ -107,8 +116,8 @@ public class LandCommand {
         teleportService.teleport(player, id).thenAcceptAsync(result -> {
             if(!player.isOnline()) return;
             switch (result) {
-                case SUCCESS -> player.sendMessage(ChatColor.GREEN + "You have been teleported.");
-                case WORLD_NOT_FOUND ->   player.sendMessage(ChatColor.RED + "Could not find world");
+                case SUCCESS -> messageProvider.send(player, Component.text("You have been teleported", NamedTextColor.GREEN));
+                case WORLD_NOT_FOUND -> messageProvider.send(player, Component.text("Could not find world!", NamedTextColor.RED));
                 default -> {}
             }
         }, mainThreadExecutor);
@@ -124,9 +133,11 @@ public class LandCommand {
             if(!player.isOnline()) return;
 
             switch (result) {
-                case SUCCESS -> player.sendMessage(ChatColor.GREEN + "You have claimed a new Land.");
-                case ALREADY_CLAIMED -> player.sendMessage("Land is already claimed.!");
-                case NAME_ALREADY_IN_USE -> messageProvider.send(player, ChatColor.YELLOW + "'"+ name +"'"+ ChatColor.RED +" is already taken!");
+                case SUCCESS -> messageProvider.send(player, Component.text("You have claimed a new Land.", NamedTextColor.GREEN)
+                        .append(Component.text("'" + name + "'", NamedTextColor.YELLOW)));
+                case ALREADY_CLAIMED -> messageProvider.send(player, Component.text("Land is already claimed!", NamedTextColor.RED));
+                case NAME_ALREADY_IN_USE -> messageProvider.send(player, Component.text("'" +  name + "'", NamedTextColor.WHITE)
+                        .append(Component.text("is already in use!", NamedTextColor.RED)));
             }
         },  mainThreadExecutor);
     }
