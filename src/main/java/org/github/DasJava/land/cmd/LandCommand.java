@@ -10,7 +10,6 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.github.DasJava.land.Land;
@@ -23,7 +22,6 @@ import org.github.DasJava.land.utils.MessageProvider;
 import org.github.DasJava.land.utils.Position3D;
 import org.jspecify.annotations.NonNull;
 
-import javax.inject.Named;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
