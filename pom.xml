@@ -53,8 +53,8 @@
 
     <repositories>
         <repository>
-            <id>spigotmc-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
 
         <repository>
@@ -65,9 +65,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>26.1.1-R0.1-SNAPSHOT</version>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>26.3.build.240-stable</version>
             <scope>provided</scope>
         </dependency>
 
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>com.github.DasJava005</groupId>
             <artifactId>CommandAPI2</artifactId>
-            <version>v1.0.8</version>
+            <version>v1.0.11</version>
         </dependency>
 
         <!--

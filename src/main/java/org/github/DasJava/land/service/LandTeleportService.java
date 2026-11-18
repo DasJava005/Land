@@ -42,6 +42,10 @@ public class LandTeleportService {
         PLAYER_OFFLINE,
     }
 
+    public void defaultTeleport(Player p, LandID id) {
+        p.teleport(calculateDefaultSpawnPoint(id, p.getWorld()));
+    }
+
     private Location calculateDefaultSpawnPoint(LandID id, World world) {
         int x =  id.x() * LandID.LAND_SIZE;
         int z = id.z() * LandID.LAND_SIZE;
