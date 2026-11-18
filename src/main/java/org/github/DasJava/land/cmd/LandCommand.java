@@ -94,6 +94,14 @@ public class LandCommand {
         }, mainThreadExecutor);
     }
 
+    @Cmd("middle")
+    public void middle(@Sender Player player) {
+        final LandID id = LandID.fromLocation(player.getLocation());
+        teleportService.teleportToCenter(player, id);
+        messageProvider.send(player, Component.text("Teleported you to center of: ", NamedTextColor.GREEN)
+                .append(Component.text(id.toString(), NamedTextColor.YELLOW)));
+    }
+
     @Cmd("go #id")
     public void go(@Sender Player player, @Arg("id") LandID id) {
         teleportService.teleport(player, id).thenAcceptAsync(result -> {

@@ -42,7 +42,7 @@ public class LandTeleportService {
         PLAYER_OFFLINE,
     }
 
-    public void defaultTeleport(Player p, LandID id) {
+    public void teleportToCenter(Player p, LandID id) {
         p.teleport(calculateDefaultSpawnPoint(id, p.getWorld()));
     }
 
