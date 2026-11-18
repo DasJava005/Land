@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.UnaryOperator;
@@ -24,7 +25,17 @@ public class LandService {
     }
 
     public CompletableFuture<Land> getLand(LandID id) {
+        Objects.requireNonNull(id, "id cannot be null");
         return landCache.getOrLoad(id);
+    }
+
+    public Optional<Land> getLandIfPresent(LandID id) {
+        Objects.requireNonNull(id, "id cannot be null");
+        CompletableFuture<Land> futureLand = landCache.getOrLoad(id);
+        if(futureLand.isDone()) {
+            return Optional.of(futureLand.join());
+        }
+        return Optional.empty();
     }
 
     public CompletableFuture<List<Land>> getLands(UUID user) {
