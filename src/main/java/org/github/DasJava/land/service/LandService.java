@@ -24,18 +24,19 @@ public class LandService {
         this.landCache = landCache;
     }
 
+    public Optional<Land> getLandIfPresent(LandID id) {
+        Objects.requireNonNull(id, "id cannot be null");
+        return landCache.getIfPresent(id);
+    }
+
     public CompletableFuture<Land> getLand(LandID id) {
         Objects.requireNonNull(id, "id cannot be null");
         return landCache.getOrLoad(id);
     }
 
-    public Optional<Land> getLandIfPresent(LandID id) {
+    public CompletableFuture<Land> preload(LandID id) {
         Objects.requireNonNull(id, "id cannot be null");
-        CompletableFuture<Land> futureLand = landCache.getOrLoad(id);
-        if(futureLand.isDone()) {
-            return Optional.of(futureLand.join());
-        }
-        return Optional.empty();
+        return landCache.getOrLoad(id);
     }
 
     public CompletableFuture<List<Land>> getLands(UUID user) {

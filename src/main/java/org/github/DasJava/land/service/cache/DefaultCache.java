@@ -8,6 +8,7 @@ import org.github.DasJava.land.service.repo.LandRepository;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -55,6 +56,20 @@ public class DefaultCache implements LandCache {
     @Override
     public CompletableFuture<List<Land>> getOrLoad(UUID uuid) {
         return players.get(uuid);
+    }
+
+    @Override
+    public Optional<Land> getIfPresent(LandID id) {
+        CompletableFuture<Land> future = lands.getIfPresent(id);
+
+        if (future == null
+                || !future.isDone()
+                || future.isCompletedExceptionally()
+                || future.isCancelled()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(future.getNow(null));
     }
 
     @Override

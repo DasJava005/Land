@@ -6,12 +6,12 @@ import com.github.DasJava005.cmdApi.reflection.InputArgumentRegistry;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.github.DasJava.land.cmd.LandCommand;
 import org.github.DasJava.land.cmd.LandIDArgument;
 import org.github.DasJava.land.listeners.BlockBreakListener;
+import org.github.DasJava.land.listeners.LandChangeListener;
 import org.github.DasJava.land.service.LandClaimService;
 import org.github.DasJava.land.service.LandMemberService;
 import org.github.DasJava.land.service.LandTeleportService;
@@ -79,6 +79,7 @@ public final class Main extends JavaPlugin {
             Listeners
          */
         register(new BlockBreakListener(service));
+        register(new LandChangeListener(service));
     }
 
     public void register(Listener listener){
