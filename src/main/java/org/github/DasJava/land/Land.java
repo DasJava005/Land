@@ -14,7 +14,7 @@ public record Land(LandID id,
                    String name,
                    UUID owner,
                    List<UUID> members,
-                   String motd) {
+                   LandMotd motd) {
 
     public Land {
         Objects.requireNonNull(id, "id cannot be null");
@@ -58,6 +58,10 @@ public record Land(LandID id,
         return members.contains(uuid);
     }
 
+    public Land withMotd(LandMotd motd) {
+        return new Land(id, createdAt, spawnPoint, name, owner, members, motd);
+    }
+
     public static Land unclaimed(LandID id) {
         return new Land(
                 id,
@@ -66,7 +70,7 @@ public record Land(LandID id,
                 "__UNCLAIMED",
                 null,
                 List.of(),
-                "");
+                LandMotd.emptyMotd());
     }
 
 }

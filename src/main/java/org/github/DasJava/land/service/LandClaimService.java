@@ -2,6 +2,7 @@ package org.github.DasJava.land.service;
 
 import org.github.DasJava.land.Land;
 import org.github.DasJava.land.LandID;
+import org.github.DasJava.land.LandMotd;
 import org.github.DasJava.land.utils.Position3D;
 
 import java.time.Instant;
@@ -18,7 +19,7 @@ public class LandClaimService {
     }
 
     public CompletableFuture<ClaimResult> claim(final LandID landID, UUID owner, Position3D home, String name) {
-        // TODO: call LandPreClaimEvent but sync with main thread
+        // TODO: call LandPreClaimEvent
         return landService.getLand(landID).thenCompose(land -> {
             if (land.isClaimed()) {
                 return CompletableFuture.completedFuture(ClaimResult.ALREADY_CLAIMED);
@@ -30,7 +31,7 @@ public class LandClaimService {
                     return CompletableFuture.completedFuture(ClaimResult.NAME_ALREADY_IN_USE);
                 }
 
-                return landService.update(landID, landOperator -> new Land(landID, Instant.now(), home, name, owner, List.of(), ""))
+                return landService.update(landID, landOperator -> new Land(landID, Instant.now(), home, name, owner, List.of(), LandMotd.emptyMotd()))
                         .thenApply(result -> {
                             // TODO: call LandClaimEvent but sync with main thread
                             return ClaimResult.SUCCESS;

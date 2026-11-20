@@ -1,19 +1,18 @@
 package org.github.DasJava.land.cmd;
 
-import com.github.DasJava005.cmdApi.reflection.annotations.Arg;
-import com.github.DasJava005.cmdApi.reflection.annotations.Cmd;
-import com.github.DasJava005.cmdApi.reflection.annotations.CommandGroup;
-import com.github.DasJava005.cmdApi.reflection.annotations.Sender;
+import com.github.DasJava005.cmdApi.reflection.annotations.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.github.DasJava.land.Land;
 import org.github.DasJava.land.LandID;
+import org.github.DasJava.land.LandMotd;
 import org.github.DasJava.land.service.LandClaimService;
 import org.github.DasJava.land.service.LandMemberService;
 import org.github.DasJava.land.service.LandService;
@@ -22,6 +21,7 @@ import org.github.DasJava.land.utils.MessageProvider;
 import org.github.DasJava.land.utils.Position3D;
 import org.jspecify.annotations.NonNull;
 
+import javax.swing.text.html.MinimalHTMLWriter;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -194,6 +194,49 @@ public class LandCommand {
                 case TARGET_NO_MEMBER -> messageProvider.send(player, Component.text("Target player is not a member!", NamedTextColor.RED));
             }
         },  mainThreadExecutor);
+    }
+
+    @Cmd("motd")
+    public void motd(@Sender Player player) {
+        final LandID id = LandID.fromLocation(player.getLocation());
+        landService.getLand(id).thenAcceptAsync(result -> {
+            LandMotd motd = result.motd();
+
+            if(motd.isEmpty()) {
+                messageProvider.send(player, Component.text("This Land has no motd set!", NamedTextColor.RED));
+                return;
+            }
+
+            final MiniMessage miniMessage = MiniMessage.miniMessage();
+            int i = 0;
+            for(String line : motd.lines()) {
+                Component lineNumber = Component.empty()
+                        .append(Component.text("[", NamedTextColor.GRAY))
+                        .append(Component.text(i, NamedTextColor.YELLOW))
+                        .append(Component.text("] ", NamedTextColor.GRAY));
+                messageProvider.send(player, lineNumber.append(miniMessage.deserialize(line)));
+                i++;
+            }
+
+        }, mainThreadExecutor);
+    }
+
+    @Cmd("motd show")
+    public void motdShow(@Sender Player player) {
+        motd(player);
+    }
+
+    @Cmd(value = "motd line set #lineNumber #msg")
+    public void motdLineSet(@Sender Player player, @Arg("lineNumber") int lineNumber, @Greedy @Arg("msg") String msg) {
+        final LandID id = LandID.fromLocation(player.getLocation());
+
+        landService.update(id, land -> {
+            LandMotd motd = land.motd().editor()
+                    .setLine(lineNumber, msg)
+                    .build();
+            return land.withMotd(motd);
+        });
+        messageProvider.send(player, "Changed motd");
     }
 
 }
